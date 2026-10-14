@@ -1,0 +1,55 @@
+#ifndef YOMADO_APP_WORKSPACE_H
+#define YOMADO_APP_WORKSPACE_H
+
+#import <AppKit/AppKit.h>
+#import <CoreGraphics/CoreGraphics.h>
+
+NS_ASSUME_NONNULL_BEGIN
+FOUNDATION_EXPORT NSString * const YMAppWorkspaceErrorDomain;
+
+// Main-thread-only window placement manager. Inventory reads window geometry,
+// never titles, content or screenshots. An inventory entry means a visible
+// ordinary window exists on the display; it does not prove GPU rendering.
+// Original placements and retained AX identities live in memory only. Closing
+// yomado must call restoreAll: before removing its displays. Never instantiate
+// this manager in the synthetic UI preview path.
+@interface YMAppWorkspace : NSObject
+@property(nonatomic, copy, readonly) NSArray<NSDictionary *> *rows;
+@property(nonatomic, copy, readonly) NSString *statusText;
+@property(nonatomic, readonly) BOOL accessibilityTrusted;
+@property(nonatomic, readonly) BOOL needsRestoreBeforeRemovingVirtualDisplay;
+- (void)refreshWithVirtualDisplayIDs:(NSArray<NSNumber *> *)displayIDs
+                   displaySnapshot:(NSArray<NSDictionary *> *)snapshot;
+// ID 0 groups physical displays; an actual ID selects just that display.
+// Rows contain appName, bundleIdentifier, pid, pids, windowCount,
+// managedWindowCount, appURL (NSURL), and optional appIcon (NSImage).
+- (NSArray<NSDictionary *> *)rowsForDisplayID:(CGDirectDisplayID)displayID;
+- (BOOL)moveApplicationAtURL:(NSURL *)URL toDisplayID:(CGDirectDisplayID)displayID
+                      error:(NSError * _Nullable * _Nullable)error;
+// Internal card dragging is source-scoped. Source 0 means physical displays;
+// other source IDs select only that display, preserving the app's other windows.
+- (BOOL)moveApplicationAtURL:(NSURL *)URL fromDisplayID:(CGDirectDisplayID)sourceID
+                toDisplayID:(CGDirectDisplayID)displayID error:(NSError * _Nullable * _Nullable)error;
+- (BOOL)restoreApplicationWithBundleIdentifier:(NSString *)bundleIdentifier
+                                fromDisplayID:(CGDirectDisplayID)displayID
+                                        error:(NSError * _Nullable * _Nullable)error;
+// Explicit virtual -> physical tile drag. Only windows on the source workspace
+// move. Reuse the remembered placement only when it belongs to the requested
+// physical display; otherwise center safely on that display. Physical ->
+// physical transfers are intentionally not handled by this recovery method.
+- (BOOL)restoreApplicationWithBundleIdentifier:(NSString *)bundleIdentifier
+                                fromDisplayID:(CGDirectDisplayID)sourceDisplayID
+                          toPhysicalDisplayID:(CGDirectDisplayID)physicalDisplayID
+                                        error:(NSError * _Nullable * _Nullable)error;
+- (BOOL)restoreDisplayID:(CGDirectDisplayID)displayID error:(NSError * _Nullable * _Nullable)error;
+- (BOOL)restoreAll:(NSError * _Nullable * _Nullable)error;
+- (BOOL)needsRestoreForDisplayID:(CGDirectDisplayID)displayID;
+
+// Compatibility with the single-display controller. Multi-display callers
+// should use the explicit destination/source methods above.
+- (void)refreshWithVirtualDisplayID:(CGDirectDisplayID)displayID displaySnapshot:(NSArray<NSDictionary *> *)snapshot;
+- (BOOL)moveApplicationAtURL:(NSURL *)URL error:(NSError * _Nullable * _Nullable)error;
+- (BOOL)restoreApplicationWithBundleIdentifier:(NSString *)bundleIdentifier error:(NSError * _Nullable * _Nullable)error;
+@end
+NS_ASSUME_NONNULL_END
+#endif
