@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Project-level pi wrapper — execs the real Pi coding-agent CLI
+exec /opt/homebrew/bin/pi "$@"
