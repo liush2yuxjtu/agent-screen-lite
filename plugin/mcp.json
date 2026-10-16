@@ -3,9 +3,9 @@
   "mcpServers": {
     "agent-screen-lite": {
       "type": "stdio",
-      "command": "python3",
+      "command": "node",
       "args": [
-        "${PLUGIN_ROOT}/../mcp-server/server.py"
+        "${PLUGIN_ROOT}/../mcp-server/dist/index.js"
       ],
       "cwd": "${PLUGIN_ROOT}/..",
       "env": {

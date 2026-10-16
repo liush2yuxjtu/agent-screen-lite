@@ -16,10 +16,12 @@ The build needs only Xcode or Command Line Tools. It produces `dist/AgentScreenL
 
 ## Run the MCP server
 
-`mcp-server/server.py` is dependency-free. Configure a local MCP entry using the included `plugin/mcp.json` or run it directly:
+The TypeScript MCP server lives in `mcp-server/`. Install, build, then configure a local MCP entry using the included `plugin/mcp.json` or run it directly:
 
 ```bash
-AGENT_SCREEN_ROOT="$PWD" python3 mcp-server/server.py
+npm --prefix mcp-server install
+npm --prefix mcp-server run build
+AGENT_SCREEN_ROOT="$PWD" node mcp-server/dist/index.js
 ```
 
 The first tool call starts the native helper and creates a user-only Unix socket at `~/Library/Application Support/agent-screen-lite/control.sock`.
