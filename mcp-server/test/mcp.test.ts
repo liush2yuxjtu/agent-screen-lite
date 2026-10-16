@@ -71,6 +71,26 @@ test("stdio MCP lists the original screen_* tools and forwards calls over the na
     assert.equal(tool.description, EXPECTED_DESCRIPTIONS[tool.name]);
   }
 
+  const moveApp = listed.tools.find((tool) => tool.name === "screen_move_app");
+  assert.ok(moveApp, "screen_move_app listed");
+  assert.equal(moveApp.inputSchema.type, "object");
+  for (const prop of ["screen", "display_id", "bundle_id", "app_path", "source_display_id"]) {
+    assert.ok(
+      moveApp.inputSchema.properties && prop in moveApp.inputSchema.properties,
+      `screen_move_app inputSchema missing property ${prop}`,
+    );
+  }
+
+  const moveMissing = await client.callTool({
+    name: "screen_move_app",
+    arguments: { screen: "Codex · Blender" },
+  });
+  assert.equal(moveMissing.isError, true);
+  assert.match(
+    moveMissing.content.map((item) => (item.type === "text" ? item.text : "")).join(""),
+    /provide bundle_id or app_path/,
+  );
+
   const status = await client.callTool({ name: "screen_status", arguments: {} });
   assert.equal(status.isError, undefined);
   assert.deepEqual(status.structuredContent, {

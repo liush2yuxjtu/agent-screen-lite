@@ -46,10 +46,7 @@ const screenMoveAppInput = z
     app_path: z.string().optional(),
     source_display_id: z.number().int().min(0).optional(),
   })
-  .strict()
-  .refine((value) => Boolean(value.bundle_id) || Boolean(value.app_path), {
-    message: "provide bundle_id or app_path",
-  });
+  .strict();
 
 const screenRestoreInput = z
   .object({
@@ -166,7 +163,14 @@ export function createServer(): McpServer {
         openWorldHint: false,
       },
     },
-    async (args) => forward("screen_move_app", args),
+    async (args) => {
+      // Cross-field validation lives here (not in a zod .refine()) so tools/list
+      // can still expose the plain object shape as the inputSchema.
+      if (!args.bundle_id && !args.app_path) {
+        return toolFailure(new Error("screen_move_app: provide bundle_id or app_path"));
+      }
+      return forward("screen_move_app", args);
+    },
   );
 
   server.registerTool(
