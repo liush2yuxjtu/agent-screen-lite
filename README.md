@@ -1,11 +1,11 @@
 # Agent Screen Lite
 
-Experimental local macOS virtual-display helper with a Python stdio MCP server and agent skill source.
+Experimental local macOS virtual-display helper with a TypeScript stdio MCP server and agent skill source.
 
 ## Requirements and build
 
 - Apple Silicon Mac with an unlocked graphical login session.
-- Xcode or Command Line Tools, and Python 3.
+- Xcode or Command Line Tools, and Node.js 18+.
 - macOS Accessibility and screen-capture permission for the executing components.
 - Uses private CGVirtualDisplay APIs; OS compatibility is not guaranteed.
 
@@ -13,12 +13,14 @@ From the repository root:
 
 ```sh
 ./build.sh
-python3 mcp-server/server.py
+npm --prefix mcp-server install
+npm --prefix mcp-server run build
+node mcp-server/dist/index.js
 ```
 
-The MCP server reads JSON-RPC from stdin; it is not an interactive terminal UI. The first tool call starts the persistent native helper. No cloud service or third-party Python dependencies are required.
+The MCP server reads JSON-RPC from stdin; it is not an interactive terminal UI. The first tool call starts the persistent native helper. Native ObjC sources stay in `native/` and still build with `./build.sh`.
 
-Configure your MCP client to launch `python3` with the absolute path to `mcp-server/server.py`. The project root is inferred from the script location; `AGENT_SCREEN_ROOT` can override it.
+Configure your MCP client to launch `node` with the absolute path to `mcp-server/dist/index.js`. The project root is inferred from the compiled entrypoint; `AGENT_SCREEN_ROOT` can override it.
 
 ## Tools
 
