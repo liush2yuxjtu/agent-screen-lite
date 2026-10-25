@@ -30,7 +30,7 @@
 java -cp tla2tools.jar tlc2.TLC -config Spec.cfg Spec.tla
 ```
 
-本 box 已用 OpenJDK 21 + tla2tools 跑过 TLC：**PASS**。CI 仍未接 TLC。
+本 box 已用 OpenJDK 21 + tla2tools 跑过 TLC：**PASS**。仓库以 `/verify`（`.agents/skills/verify/SKILL.md`）为合并门禁；`formal/` 存在时 `tla_formal` 必过（缺 jar/Java → FAIL，不是 SKIP）。
 
 ## 范围
 
