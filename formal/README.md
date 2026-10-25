@@ -30,7 +30,7 @@
 java -cp tla2tools.jar tlc2.TLC -config Spec.cfg Spec.tla
 ```
 
-当前 CI / 本 box **未安装 TLC**；Spec 为纯 TLA+。
+本 box 已用 OpenJDK 21 + tla2tools 跑过 TLC：**PASS**。CI 仍未接 TLC。
 
 ## 范围
 
